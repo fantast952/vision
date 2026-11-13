@@ -1,0 +1,13 @@
+# 忽略编译生成的可执行文件
+test_multi_color
+test_cpp
+a.out
+
+# 忽略测试生成的图片
+cpp_result_*.jpg
+result_*.jpg
+result_test_*.jpg
+
+# 忽略一些临时文件
+*.o
+*.out
