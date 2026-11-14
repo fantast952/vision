@@ -1,4 +1,13 @@
 # 忽略编译生成的可执行文件
+test_video
+test_multi_color
+a.out
+
+# 忽略所有的图片、视频和备份文件
+*.jpg
+*.png
+*.mp4
+*.save# 忽略编译生成的可执行文件
 test_multi_color
 test_cpp
 a.out
