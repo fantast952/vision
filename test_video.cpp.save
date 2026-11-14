@@ -1,0 +1,74 @@
+#include <iostream>
+#include <opencv2/opencv.hpp>
+#include <chrono>
+
+using namespace cv;
+using namespace std;
+using namespace std::chrono;
+
+// 复用你之前的识别函数，这里为了简洁只写个框架，核心逻辑你直接从原文件复制
+string detect_color(Mat& frame, Mat& result_img) {
+    // 这里把你 test_multi_color.cpp 里 detect_color 的代码完全复制过来
+    // 只要把 img 换成 frame 就行
+    // ... 为了不占篇幅，这里省略你之前的识别逻辑 ...
+    
+    // 临时占位，模拟返回结果
+    result_img = frame.clone(); 
+    return "RED"; // 假装识别到了红色
+}
+
+int main() {
+    // 1. 打开视频文件 (如果是摄像头，把 "test_video.mp4" 换成 0)
+    VideoCapture cap("test_video.mp4");
+    
+    if (!cap.isOpened()) {
+        cerr << "[ERROR] Cannot open video or camera!" << endl;
+        return -1;
+    }
+
+    Mat frame;
+    int frame_count = 0;
+    int save_interval = 30; // 每处理30帧，保存一张结果图，避免把硬盘塞满
+
+    cout << "Start processing video..." << endl;
+
+    while (true) {
+        // 2. 读取一帧
+        cap >> frame;
+        if (frame.empty()) {
+            cout << "Video processing finished." << endl;
+            break; // 视频读完了，退出循环
+        }
+
+        // 3. 开始计时
+        auto start = high_resolution_clock::now();
+
+        // 4. 调用识别函数
+        Mat result_img;
+        string result = detect_color(frame, result_img);
+
+        // 5. 计算耗时
+        auto end = high_resolution_clock::now();
+        double latency = duration_cast<microseconds>(end - start).count() / 1000.0;
+
+        // 6. 把结果和耗时画在画面上
+        string text = result + " (" + to_string((int)latency) + "ms)";
+        putText(result_img, text, Point(20, 50), FONT_HERSHEY_SIMPLEX, 1.0, Scalar(255, 255, 255), 2);
+
+        // 7. 终端打印实时结果
+        cout << "Frame " << frame_count << " | Result: " << result << " | Latency: " << latency << " ms" << endl;
+
+        // 8. 每隔30帧，保存一张图片到本地，用来检查效果
+        if (frame_count % save_interval == 0) {
+            string filename = "video_result_" + to_string(frame_count) + ".jpg";
+            imwrite(filename, result_img);
+            cout << "Saved: " << filename << endl;
+        }
+
+        frame_count++;
+    }
+
+    cap.release();
+    cout << "Done. Total frames processed: " << frame_count << endl;
+    return 0;
+}
